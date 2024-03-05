@@ -1,2 +1,2 @@
 # TDAS
- Utilities for Timestamped Document Authentication Seal (TDAS) research project
+ Utilities for Timestamped Document Authenticity Seal (TDAS) research project
