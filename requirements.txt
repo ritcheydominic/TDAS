@@ -1,0 +1,7 @@
+segno
+pyzbar
+Pillow
+python-dotenv
+dnspython
+pynacl
+opentimestamps-client
