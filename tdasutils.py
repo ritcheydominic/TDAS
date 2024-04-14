@@ -55,4 +55,4 @@ def get_public_key(key_domain_name: str):
     if begin_date >= expiry_date:
         raise Exception("Invalid key begin/expiry dates")
     
-    return (version, key_format, public_key, begin_date, expiry_date)
+    return (version, key_format, public_key + "=", begin_date, expiry_date)
