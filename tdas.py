@@ -73,7 +73,7 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     if timestamp_verification_result == False:
         raise Exception("Timestamp forged or corrupt")
     
-    # Verify manifest
+    # Verify manifest signature
     verify_key = VerifyKey(bytes(public_key, 'utf-8'), encoder=Base64Encoder)
     manifest_data = verify_key.verify(bytes(signed_manifest, 'utf-8'), encoder=HexEncoder).decode("utf-8")
     manifest = json.loads(manifest_data)
@@ -85,6 +85,7 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     if current_timestamp > public_key_expiry_date:
         raise Exception("Public key no longer valid")
     
+    # Verify manifest contents against document
     print("Document Summary")
     for key in manifest:
         print("{}: {}".format(key, manifest[key]))
@@ -94,14 +95,15 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     
     print("Document authenticated!")
 
+def generate_key():
+    signing_key = SigningKey.generate()
+    verify_key = signing_key.verify_key
+
+    signing_key_b64 = signing_key.encode(encoder=Base64Encoder)
+    verify_key_b64 = verify_key.encode(encoder=Base64Encoder)
+
+    print(signing_key_b64)
+    print(verify_key_b64)
+
 seal_document('test_key_2.json', 'test_manifest.json')
 authenticate_document("seal_qr_code.png", "timestamp_qr_code.png")
-
-# signing_key = SigningKey.generate()
-# verify_key = signing_key.verify_key
-
-# signing_key_b64 = signing_key.encode(encoder=Base64Encoder)
-# verify_key_b64 = verify_key.encode(encoder=Base64Encoder)
-
-# print(signing_key_b64)
-# print(verify_key_b64)
