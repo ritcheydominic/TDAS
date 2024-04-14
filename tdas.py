@@ -55,7 +55,7 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     seal = json.loads(seal_data)
 
     # Decode timestamp QR code
-    timestamp_qr_code = decode(Image.open(timestamp_qr_code_file_name))
+    timestamp_qr_code = decode(Image.open(timestamp_qr_code_file_name), binary=True)
     timestamp_data = timestamp_qr_code[0].data
 
     # Decompose seal and fetch public key
