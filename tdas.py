@@ -36,7 +36,7 @@ def seal_document(key_file_name, manifest_file_name):
     seal_qr_code = segno.make_qr(json.dumps(seal), mode="byte")
     seal_qr_code.save("seal_qr_code.png", border=3, scale=5)
 
-    # Uncomment lines 40 and 43 and comment out line 44 to generate a timestamp file and use that
+    # Uncomment lines 42 and 45 and comment out line 46 to generate a timestamp file and use that
 
     # Timestamp manifest
     # timestamp_file_name = timestamp_signature(signed_manifest.decode(), "timestamp")
