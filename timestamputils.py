@@ -64,7 +64,7 @@ def verify_timestamp(ots_file_path):
             return None
     except Exception as e:
         print("An error occurred during verification:", str(e))
-        return False
+        return None
 
 def main():
     # parser = argparse.ArgumentParser(description='Timestamp a signature using OpenTimestamps.')
