@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import argparse
 import subprocess
 import os
+import re
 
 load_dotenv()
 rpc_username = os.environ.get("RPC_USER")
@@ -51,11 +52,16 @@ def verify_timestamp(ots_file_path):
         if result.returncode == 0:
             print("Verification successful:")
             print(result.stderr)
-            return True
+            match = re.search(r"as of (\d{4}-\d{2}-\d{2})", result.stderr)
+            if match:
+                return match.group(1)
+            else:
+                print("Date not found in the verification output.")
+                return None
         else:
             print("Verification failed:")
             print(result.stderr)
-            return False
+            return None
     except Exception as e:
         print("An error occurred during verification:", str(e))
         return False
