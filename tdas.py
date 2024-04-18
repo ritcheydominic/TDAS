@@ -62,28 +62,29 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     seal_version = seal["version"]
     signed_manifest = seal["signature"]
     verify_key_domain_name = seal["public_key_domain_name"]
-    public_key_version, public_key_format, public_key, public_key_begin_date, public_key_expiry_date = get_public_key(verify_key_domain_name)
+    dns_record_tdas_version, public_key_format, public_key, public_key_begin_date, public_key_expiry_date = get_public_key(verify_key_domain_name)
 
-    # Verify timestamp
+    # Verify timestamp against blockchain
     timestamp_file = open("temp.ots", "wb")
     timestamp_file.write(timestamp_data)
     timestamp_file.close()
     timestamp_verification_result = verify_timestamp("temp.ots")
     os.remove("temp.ots")
-    if timestamp_verification_result == False:
+    if timestamp_verification_result == None:
         raise Exception("Timestamp forged or corrupt")
+    
+    # Verify timestamp against public key validity dates
+    timestamp_year, timestamp_month, timestamp_day = timestamp_verification_result.split("-")
+    timestamp = datetime(year=timestamp_year, month=timestamp_month, day=timestamp_day, hour=0, minute=0, second=0)
+    if timestamp < public_key_begin_date:
+        raise Exception("Public key was not yet valid when timestamped")
+    elif timestamp > public_key_expiry_date:
+        raise Exception("Public key was no longer valid when timestamped")
     
     # Verify manifest signature
     verify_key = VerifyKey(bytes(public_key, 'utf-8'), encoder=Base64Encoder)
     manifest_data = verify_key.verify(bytes(signed_manifest, 'utf-8'), encoder=HexEncoder).decode("utf-8")
     manifest = json.loads(manifest_data)
-
-    # Verify public key validity
-    current_timestamp = datetime.now()
-    if current_timestamp < public_key_begin_date:
-        raise Exception("Public key not yet valid")
-    if current_timestamp > public_key_expiry_date:
-        raise Exception("Public key no longer valid")
     
     # Verify manifest contents against document
     print("Document Summary")
