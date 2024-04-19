@@ -1,5 +1,7 @@
-import dns.resolver
 from datetime import datetime
+
+import dns.resolver
+
 
 def get_public_key(key_domain_name: str):
     dns_answers = dns.resolver.resolve(key_domain_name, "TXT").rrset
@@ -49,7 +51,7 @@ def get_public_key(key_domain_name: str):
         else:
             raise Exception("Unknown property in DNS record")
     
-    if version == None or key_format == None or public_key == "" or begin_date == None or expiry_date == None:
+    if version is None or key_format is None or public_key == "" or begin_date is None or expiry_date is None:
         raise Exception("Required properties not all specified in DNS record")
     
     if begin_date >= expiry_date:

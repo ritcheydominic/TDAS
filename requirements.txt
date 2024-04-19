@@ -5,3 +5,7 @@ python-dotenv
 dnspython
 pynacl
 opentimestamps-client
+brotli
+PyPDF2
+qrcode[pil]
+cryptography

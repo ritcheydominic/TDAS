@@ -1,16 +1,18 @@
 import base64
+import json
 import time
 import zlib
-import json
+from io import BytesIO
+
 import brotli
 import qrcode
-from PyPDF2 import PdfReader, PdfWriter, Transformation
-from io import BytesIO
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.x509 import load_pem_x509_certificate
+from PyPDF2 import PdfReader, PdfWriter, Transformation
+
 
 def sign_string_with_current_timestamp(string_to_sign, private_key_path):
     timestamp = str(int(time.time()))

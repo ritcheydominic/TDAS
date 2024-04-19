@@ -1,9 +1,9 @@
-from dotenv import load_dotenv
-
 import argparse
-import subprocess
 import os
 import re
+import subprocess
+
+from dotenv import load_dotenv
 
 load_dotenv()
 rpc_username = os.environ.get("RPC_USER")
@@ -41,12 +41,12 @@ def verify_timestamp(ots_file_path):
     # Ensure the .ots file exists
     if not os.path.isfile(ots_file_path):
         print("Timestamp file does not exist.")
-        return
+        return None
 
     # Use opentimestamps to verify the timestamp
     try:
         # Execute the ots verify command and capture the output
-        result = subprocess.run(['ots', '--bitcoin-node', f'http://{rpc_username}:{rpc_password}@127.0.0.1:8332/', 'verify', ots_file_path], capture_output=True, text=True)
+        result = subprocess.run(['ots', '--bitcoin-node', f'http://{rpc_username}:{rpc_password}@127.0.0.1:8332/', 'verify', '-f', 'test_manifest.sig', ots_file_path], capture_output=True, text=True)
         print(result)
         # Print the output of the command
         if result.returncode == 0:

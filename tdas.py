@@ -1,16 +1,17 @@
-import json
-import segno
 import base64
+import json
 import os
-from pyzbar.pyzbar import decode
-from PIL import Image
-from timestamputils import timestamp_signature, verify_timestamp
-from tdasutils import get_public_key
-from nacl.encoding import Base64Encoder
-from nacl.encoding import HexEncoder
-from nacl.signing import SigningKey
-from nacl.signing import VerifyKey
 from datetime import datetime
+
+import segno
+from nacl.encoding import Base64Encoder, HexEncoder
+from nacl.signing import SigningKey, VerifyKey
+from PIL import Image
+from pyzbar.pyzbar import decode
+
+from tdasutils import get_public_key
+from timestamputils import timestamp_signature, verify_timestamp
+
 
 def seal_document(key_file_name, manifest_file_name):
     # Load private (signing) and public (verifying) key data
@@ -24,9 +25,12 @@ def seal_document(key_file_name, manifest_file_name):
     manifest_data = json.load(manifest_file)
     manifest = json.dumps(manifest_data)
 
-    # Sign manifest
+    # Sign manifest and save for comparison later
     signed_manifest = signing_key.sign(bytes(manifest, 'utf-8'))
     signing_key.verify_key.verify(signed_manifest)
+
+    with open('test_manifest.sig', 'w') as fp:
+        fp.write(signed_manifest.decode(errors="ignore"))
 
     # Generate seal QR code
     seal = dict()
@@ -36,10 +40,10 @@ def seal_document(key_file_name, manifest_file_name):
     seal_qr_code = segno.make_qr(json.dumps(seal), mode="byte")
     seal_qr_code.save("seal_qr_code.png", border=3, scale=5)
 
-    # Uncomment lines 42 and 45 and comment out line 46 to generate a timestamp file and use that
+    # Uncomment lines 43 and 46 and comment out line 47 to generate a timestamp file and use that
 
     # Timestamp manifest
-    # timestamp_file_name = timestamp_signature(signed_manifest.decode(), "timestamp")
+    # timestamp_file_name = timestamp_signature(signed_manifest.decode(errors="ignore"), "timestamp")
 
     # Generate timestamp
     # timestamp_file = open(timestamp_file_name, mode="rb")
@@ -70,7 +74,7 @@ def authenticate_document(seal_qr_code_file_name, timestamp_qr_code_file_name):
     timestamp_file.close()
     timestamp_verification_result = verify_timestamp("temp.ots")
     os.remove("temp.ots")
-    if timestamp_verification_result == None:
+    if timestamp_verification_result is None:
         raise Exception("Timestamp forged or corrupt")
     
     # Verify timestamp against public key validity dates
